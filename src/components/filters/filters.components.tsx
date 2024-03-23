@@ -1,11 +1,13 @@
-import Dropdown from "../dropdown/dropdown.component.tsx";
 import PriceFilter from "./priceFilter.component.tsx";
+import ExceptionalWordFilter from "./exceptionalFilter.component.tsx";
+import DateFilter from "./dateFilter.component.tsx";
 
 const Filters = () => {
     return (
         <div className={"root_filters flex "}>
             <PriceFilter/>
-            <Dropdown child={<h1>test2</h1>} name={"Ограничение по дате"}/>
+            <ExceptionalWordFilter/>
+            <DateFilter/>
         </div>
     );
 };

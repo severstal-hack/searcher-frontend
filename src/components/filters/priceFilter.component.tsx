@@ -1,5 +1,5 @@
 import Dropdown from "../dropdown/dropdown.component.tsx";
-import {useRef, useState} from "react";
+import {useState} from "react";
 
 interface IPrice {
     min?: number;
@@ -23,8 +23,8 @@ const PriceFilter = () => {
 
     const generateLabel = () => {
         let str = ""
-        if (price.min) str += `От: ${price.min} ₽`
-        if (price.max) str += ` До: ${price.max} ₽`
+        if (price.min) str += `От: ${price.min.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')} ₽`
+        if (price.max) str += ` До: ${price.max.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')} ₽`
 
         return str
     }
@@ -32,11 +32,11 @@ const PriceFilter = () => {
     const child = <>
         <div className={"flex flex-row p-2"}>
             <input onChange={(e) => onChange("min", Number.parseFloat(e.target.value))} type="number" id="first_name"
-                   className="mr-5 text-center border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                   className="w-full mr-5  text-center border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 "
                    placeholder="От" required/>
             <input type="number" id="first_name"
                    onChange={(e) => onChange("max", Number.parseFloat(e.target.value))}
-                   className="text-center  border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                   className="w-full text-center  border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 "
                    placeholder="До" required/>
         </div>
     </>
