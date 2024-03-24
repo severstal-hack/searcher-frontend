@@ -1,7 +1,14 @@
-import Dropdown from "../dropdown/dropdown.component.tsx";
+import Dropdown, {DropdownHandle} from "../dropdown/dropdown.component.tsx";
 import {Datepicker} from "flowbite-react";
+import {forwardRef, useImperativeHandle, useRef} from "react";
 
-const DateFilter = () => {
+interface Props {
+    onClick: () => void;
+}
+
+const DateFilter = forwardRef<DropdownHandle, Props>(({onClick}, ref) => {
+    const dropdownRef = useRef<DropdownHandle>(null)
+
     const child = <>
         <div className={"px-2"}>
             <div className={"flex items-center flex-row mb-2"}>
@@ -17,11 +24,20 @@ const DateFilter = () => {
         </div>
     </>
 
+    useImperativeHandle(ref, () => {
+        return {
+            close() {
+                dropdownRef.current?.close();
+            }
+        }
+    }, [])
+
     return (
         <div>
-            <Dropdown name={"Ограничение по дате"} withoutAccept={true} onSubmit={() => true} child={child}/>
+            <Dropdown onOpenDropdown={onClick} ref={dropdownRef} name={"Ограничение по дате"} withoutAccept={true}
+                      onSubmit={() => true} child={child}/>
         </div>
     );
-};
+});
 
 export default DateFilter;

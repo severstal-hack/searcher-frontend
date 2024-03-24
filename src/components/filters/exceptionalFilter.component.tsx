@@ -1,8 +1,14 @@
-import Dropdown from "../dropdown/dropdown.component.tsx";
-import {useState} from "react";
+import Dropdown, {DropdownHandle} from "../dropdown/dropdown.component.tsx";
+import {forwardRef, useImperativeHandle, useRef, useState} from "react";
 import Exception from "./exception.component.tsx";
 
-const ExceptionalWordFilter = () => {
+
+interface Props {
+    onClick: () => void;
+}
+
+const ExceptionalWordFilter = forwardRef<DropdownHandle, Props>(({onClick}, ref) => {
+    const dropdownRef = useRef<DropdownHandle>(null)
     const [inputValue, setInputValue] = useState<string>("")
     const [words, setWords] = useState<string[]>([])
 
@@ -31,6 +37,14 @@ const ExceptionalWordFilter = () => {
         deleteWord(word)
     }
 
+    useImperativeHandle(ref, () => {
+        return {
+            close() {
+                dropdownRef.current?.close();
+            }
+        }
+    }, [])
+
     const child = <div className={"p-2 w-full"}>
         <div className={"flex flex-row flex-wrap mb-2"}>
             {words.map(w => <Exception onClick={() => onDeleteTag(w)} name={w}/>)}
@@ -42,11 +56,13 @@ const ExceptionalWordFilter = () => {
     </div>
     return (
         <div>
-            <Dropdown name={words.length > 0 ? `Исключено: ${words.length}` : "Исключения"} buttonName={"Добавить"}
+            <Dropdown onOpenDropdown={onClick} ref={dropdownRef}
+                      name={words.length > 0 ? `Исключено: ${words.length}` : "Исключения"}
+                      buttonName={"Добавить"}
                       onSubmit={onAddTag}
                       child={child}/>
         </div>
     );
-};
+});
 
 export default ExceptionalWordFilter;

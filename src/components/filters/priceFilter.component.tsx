@@ -1,12 +1,18 @@
-import Dropdown from "../dropdown/dropdown.component.tsx";
-import {useState} from "react";
+import Dropdown, {DropdownHandle} from "../dropdown/dropdown.component.tsx";
+import {forwardRef, useImperativeHandle, useRef, useState} from "react";
 
 interface IPrice {
     min?: number;
     max?: number;
 }
 
-const PriceFilter = () => {
+interface Props {
+    onClick: () => void;
+}
+
+
+const PriceFilter = forwardRef<DropdownHandle, Props>(({onClick}: Props, ref) => {
+    const dropdownRef = useRef<DropdownHandle>(null)
     const [price, setPrice] = useState<IPrice>({})
     const [apply, setApply] = useState<string>("")
 
@@ -15,6 +21,7 @@ const PriceFilter = () => {
             return {...prev, [delta]: value}
         })
     }
+
 
     const onSubmit = (): boolean => {
         setApply(generateLabel())
@@ -28,6 +35,14 @@ const PriceFilter = () => {
 
         return str
     }
+
+    useImperativeHandle(ref, () => {
+        return {
+            close() {
+                dropdownRef.current?.close()
+            }
+        }
+    }, [])
 
     const child = <>
         <div className={"flex flex-row p-2"}>
@@ -43,10 +58,10 @@ const PriceFilter = () => {
 
     return (
         <div>
-            <Dropdown onSubmit={onSubmit} child={child}
+            <Dropdown onOpenDropdown={onClick} ref={dropdownRef} onSubmit={onSubmit} child={child}
                       name={apply.length < 1 ? "Ограничение по цене" : apply}/>
         </div>
     );
-};
+});
 
 export default PriceFilter;

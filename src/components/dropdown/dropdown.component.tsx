@@ -1,21 +1,34 @@
 import "./dropdown.component.css"
-import {useRef, useState} from "react";
+import {forwardRef, useImperativeHandle, useRef, useState} from "react";
 import * as React from "react";
 
-interface Props {
+export interface DropdownProps {
     name: string;
     onSubmit: () => boolean;
     child: React.ReactNode
     buttonName?: string;
     withoutAccept?: boolean;
+    onOpenDropdown: () => void;
 }
 
-const Dropdown = ({name, child, onSubmit, buttonName, withoutAccept}: Props) => {
+export type DropdownHandle = {
+    close: () => void
+}
+
+const Dropdown = forwardRef<DropdownHandle, DropdownProps>(({
+                                                                name,
+                                                                child,
+                                                                onSubmit,
+                                                                buttonName,
+                                                                withoutAccept,
+                                                                onOpenDropdown
+                                                            }: DropdownProps, ref) => {
     const [selected, setSelected] = useState<boolean>(false)
     const menuRef = useRef<HTMLDivElement>(null)
 
     const switchMenu = () => {
         if (menuRef.current!.classList.contains("hidden")) {
+            onOpenDropdown()
             menuRef.current!.classList.remove("hidden")
             setSelected(true)
         } else {
@@ -33,12 +46,21 @@ const Dropdown = ({name, child, onSubmit, buttonName, withoutAccept}: Props) => 
             switchMenu()
     }
 
+    useImperativeHandle(ref, () => {
+        return {
+            close() {
+                menuRef.current!.classList.add("hidden")
+                setSelected(false)
+            }
+        }
+    }, [])
+
     return (
         <div className={"mr-5"}>
-            <div className="relative inline-block w-60  text-left">
+            <div className="relative inline-block  text-left">
                 <button id="dropdown-button"
                         onClick={onClick}
-                        className="inline-flex justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-md shadow-sm  ">
+                        className="inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-md shadow-sm  ">
                     {name}
                     <svg style={selected ? {transform: "rotate(180deg)"} : {}} xmlns="http://www.w3.org/2000/svg"
                          className="w-5 h-5 ml-2 -mr-1" viewBox="0 0 20 20"
@@ -50,7 +72,7 @@ const Dropdown = ({name, child, onSubmit, buttonName, withoutAccept}: Props) => 
                 </button>
                 <div id="dropdown-menu"
                      ref={menuRef}
-                     className="origin-top-right absolute right-0 mt-3 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden">
+                     className="w-80  absolute left-1/2 -translate-x-1/2   mt-3 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden">
                     <div className="py-2 p-2" role="menu" aria-orientation="vertical"
                          aria-labelledby="dropdown-button">
                         {child}
@@ -65,6 +87,6 @@ const Dropdown = ({name, child, onSubmit, buttonName, withoutAccept}: Props) => 
             </div>
         </div>
     );
-};
+});
 
 export default Dropdown;

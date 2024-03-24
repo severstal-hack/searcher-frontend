@@ -4,11 +4,11 @@ import Filters from "../../components/filters/filters.components.tsx";
 
 const MainPage = () => {
     return (
-        <div className="grid grid-cols-6 gap-4 mt-5">
-            <div className={"col-start-2 col-span-4"}>
-                <SearchInput/>
-            </div>
-            <div className={"col-start-2 col-span-4 "}>
+        <div className="h-screen grid grid-cols-6 grid-rows-3 gap-4">
+            <div className={"col-start-2 row-start-2 col-span-4"}>
+                <div className={"mb-5"}>
+                    <SearchInput/>
+                </div>
                 <Filters/>
             </div>
         </div>);
