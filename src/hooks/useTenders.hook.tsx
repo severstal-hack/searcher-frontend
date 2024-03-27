@@ -1,6 +1,17 @@
 import {useState} from "react";
 import Tender from "../domain/tender.ts";
 import api from "../api.ts";
+
+export interface SearchTendersFilters {
+    excludes?: string[];
+    date?: {
+        after?: Date;
+        before?: Date;
+    };
+    includeArchive?: boolean;
+}
+
+
 const t = [
     {
         "id": "ID 876689",
@@ -257,28 +268,81 @@ const t = [
 ]
 
 export const useTenders = () => {
+    const pageSize = 10;
     const [tenders, setTenders] = useState<Tender[]>()
+    const [currentPage, setCurrentPage] = useState<number>(1)
     const [count, setCount] = useState<number>(0)
     const [loading, setLoading] = useState<boolean>(false)
-    const fetchData = async (query: string) => {
-        setTenders(t)
-        // setLoading(true)
-        // try {
-        //     const uri = `/parse?query=${query}`
-        //     const res = await api.get(uri)
-        //     const body = await res.json();
-        //     console.log(body)
-        //     if (res.status !== 200)
-        //         throw new Error(body.message)
-        //     console.log(tenders)
-        //     setTenders(body.tenders)
-        //     setCount(body.count)
-        //     setLoading(false)
-        // } catch (error) {
-        //     console.log(error)
-        //     setLoading(false)
-        // }
+    const fetchData = async (query: string, filters?: SearchTendersFilters) => {
+        // setTenders(t)
+        // setCount(t.length)
+        setLoading(true)
+        try {
+            let uri = `/parse?query=${query}`
+            if (filters)
+                uri += buildFiltersQuery(filters)
+            const res = await api.get(uri)
+            const body = await res.json();
+            console.log(body)
+            if (res.status !== 200)
+                throw new Error(body.message)
+            console.log(tenders)
+            setTenders(body.tenders)
+            setCount(body.count)
+            setLoading(false)
+        } catch (error) {
+            console.log(error)
+            setLoading(false)
+        }
     }
 
-    return {tenders, count, loading, updateTenders: fetchData}
+    const buildFiltersQuery = (filters: SearchTendersFilters): string => {
+        let query = ""
+        if (filters.includeArchive)
+            query += "&include_archive=true"
+        if (filters.date) {
+            if (filters.date.after) {
+                const d = filters.date.after
+                console.log("FILTER AFTER: ", d)
+                query += `&start_date=${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`
+            }
+            if (filters.date.before) {
+                const d = filters.date.before
+                console.log("FILTER BEFORE: ", d)
+                query += `&end_date=${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`
+            }
+        }
+        if (filters.excludes) {
+            filters.excludes.forEach(exclude => query += `&exclude=${exclude}`)
+        }
+
+        return query;
+    }
+
+    const nextPage = () => {
+        const pages = Math.round(count / pageSize);
+        if (currentPage === pages)
+            return;
+
+        setCurrentPage(page => page + 1)
+    }
+
+    const prevPage = () => {
+        if (currentPage === 1)
+            return;
+
+        setCurrentPage(page => page - 1)
+    }
+
+    return {
+        tenders: tenders?.slice((currentPage - 1) * pageSize, currentPage * pageSize),
+        count,
+        loading,
+        updateTenders: fetchData,
+        pages: Math.round(count / pageSize),
+        nextPage,
+        prevPage,
+        currentPage,
+        setCurrentPage: setCurrentPage
+    }
 }

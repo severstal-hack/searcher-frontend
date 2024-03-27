@@ -7,7 +7,12 @@ interface Props {
     onClick: () => void;
 }
 
-const ExceptionalWordFilter = forwardRef<DropdownHandle, Props>(({onClick}, ref) => {
+export type ExceptionalWordFilterHandler = {
+    close: () => void;
+    getExceptionalWords: () => string[];
+}
+
+const ExceptionalWordFilter = forwardRef<ExceptionalWordFilterHandler, Props>(({onClick}, ref) => {
     const dropdownRef = useRef<DropdownHandle>(null)
     const [inputValue, setInputValue] = useState<string>("")
     const [words, setWords] = useState<string[]>([])
@@ -41,9 +46,13 @@ const ExceptionalWordFilter = forwardRef<DropdownHandle, Props>(({onClick}, ref)
         return {
             close() {
                 dropdownRef.current?.close();
+            },
+            getExceptionalWords() {
+                return words;
             }
+
         }
-    }, [])
+    }, [words])
 
     const child = <div className={"p-2 w-full"}>
         <div className={"flex flex-row flex-wrap mb-2"}>

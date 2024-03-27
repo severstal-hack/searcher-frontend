@@ -9,11 +9,11 @@ const MainPage = () => {
     const tenderListRef = useRef<TenderListHandle>(null)
 
     const onSearch = (value: string) => {
-        tenderListRef.current?.refresh(value)
+        tenderListRef.current?.refresh(value, filtersRef.current?.getAllFilters())
     }
 
     return (
-        <div className="min-h-screen grid grid-cols-6 pt-5 bg-gray-100 pb-10 overflow-hidden">
+        <div className="min-h-screen grid grid-cols-6 pt-5 bg-gray-100 pb-10 ">
             <div className={"col-start-2  col-span-4"}>
                 <div className={"mb-5"}>
                     <SearchInput onSearch={onSearch} onFocus={() => filtersRef.current?.closeAllFilters()}/>

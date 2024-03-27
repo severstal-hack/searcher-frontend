@@ -1,25 +1,37 @@
 import Dropdown, {DropdownHandle} from "../dropdown/dropdown.component.tsx";
 import {Datepicker} from "flowbite-react";
-import {forwardRef, useImperativeHandle, useRef} from "react";
+import {forwardRef, useImperativeHandle, useRef, useState} from "react";
 
 interface Props {
     onClick: () => void;
 }
 
-const DateFilter = forwardRef<DropdownHandle, Props>(({onClick}, ref) => {
+export type DateFilterHandler = {
+    close: () => void;
+    getDates: () => { after?: Date, before?: Date };
+}
+
+const DateFilter = forwardRef<DateFilterHandler, Props>(({onClick}, ref) => {
+    const [after, setAfter] = useState<Date | undefined>(undefined)
+    const [before, setBefore] = useState<Date | undefined>(undefined)
     const dropdownRef = useRef<DropdownHandle>(null)
 
     const child = <>
         <div className={"px-2"}>
             <div className={"flex items-center flex-row my-2"}>
                 <span className={"mr-2 w-16"}>После: </span>
-                <Datepicker showTodayButton={false} labelClearButton={"Очистить"} className={"col-start-1"}
-                            weekStart={1} language={"ru-Ru"}/>
+                <Datepicker
+                    onSelectedDateChanged={(d) => setAfter(d)}
+                    showTodayButton={false} labelClearButton={"Очистить"}
+                    className={"col-start-1"}
+                    weekStart={1} language={"ru-Ru"}/>
             </div>
             <div className={"flex items-center flex-row mb-2"}>
                 <span className={"mr-2 w-16"}>До: </span>
-                <Datepicker showTodayButton={false} labelClearButton={"Очистить"} className={"col-start-1"}
-                            weekStart={1} language={"ru-Ru"}/>
+                <Datepicker
+                    onSelectedDateChanged={(d) => setBefore(d)}
+                    showTodayButton={false} labelClearButton={"Очистить"} className={"col-start-1"}
+                    weekStart={1} language={"ru-Ru"}/>
             </div>
         </div>
     </>
@@ -28,9 +40,15 @@ const DateFilter = forwardRef<DropdownHandle, Props>(({onClick}, ref) => {
         return {
             close() {
                 dropdownRef.current?.close();
+            },
+            getDates() {
+                return {
+                    after: after,
+                    before: before,
+                }
             }
         }
-    }, [])
+    }, [after, before])
 
     return (
         <div>

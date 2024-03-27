@@ -1,21 +1,30 @@
-import {useTenders} from "../../hooks/useTenders.hook.tsx";
+import {SearchTendersFilters, useTenders} from "../../hooks/useTenders.hook.tsx";
 import {forwardRef, useImperativeHandle} from "react";
 import Loader from "../loader/loader.component.tsx";
+import Pagination from "./pagination.component.tsx";
 
 export type TenderListHandle = {
-    refresh: (value: string) => void;
+    refresh: (value: string, filters?: SearchTendersFilters) => void;
 }
 
 const TenderList = forwardRef<TenderListHandle>((_, ref) => {
-    const {tenders, updateTenders, loading} = useTenders()
+    const {
+        tenders,
+        updateTenders,
+        loading,
+        pages,
+        currentPage,
+        nextPage, prevPage,
+        setCurrentPage
+    } = useTenders()
 
     useImperativeHandle(ref, () => {
         return {
-            refresh: (value: string) => {
-                updateTenders(value)
+            refresh: (value: string, filters?: SearchTendersFilters) => {
+                updateTenders(value, filters)
             }
         }
-    }, [])
+    }, [updateTenders])
 
     const checkStatus = (status: string) => {
         switch (status) {
@@ -108,8 +117,10 @@ const TenderList = forwardRef<TenderListHandle>((_, ref) => {
                     )}
                     </tbody>
                 </table>
+                <Pagination onChangeCurrentPage={setCurrentPage} onNextPage={() => nextPage()}
+                            onPrevPage={() => prevPage()} currentPage={currentPage}
+                            totalPages={pages}/>
             </div>
-
         </div>
     );
 });
