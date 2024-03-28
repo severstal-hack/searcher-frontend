@@ -13,6 +13,7 @@ class API {
     }
 }
 
-const api = new API("http://26.64.250.196:8080");
+//const api = new API("http://26.64.250.196:8080");
+const api = new API("http://localhost:8080");
 
 export default api
