@@ -38,7 +38,7 @@ const Filters = forwardRef<FiltersHandle>((_, ref) => {
                 return filters
             }
         }
-    }, [])
+    }, [includeArchive])
 
     return (
         <div className={"root_filters flex select-none"}>
